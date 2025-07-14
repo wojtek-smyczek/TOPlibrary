@@ -36,6 +36,15 @@ function createCard(book) {
 addBookToLibrary('Stary', 'Hemingway');
 addBookToLibrary('Poezja Wybrana', 'Milosz');
 
+addBookToLibrary('Stary', 'Hemingway');
+addBookToLibrary('Poezja Wybrana', 'Milosz');
+
+addBookToLibrary('Stary', 'Hemingway');
+addBookToLibrary('Poezja Wybrana', 'Milosz');
+
+addBookToLibrary('Stary', 'Hemingway');
+addBookToLibrary('Poezja Wybrana', 'Milosz');
+
 
 
 // Wait for DOM to load before attaching event listeners
