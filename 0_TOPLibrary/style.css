@@ -68,11 +68,11 @@ body {
 .card {
     background-color: lightgray;
     border-radius: 10px;
-    height: fit-content;
-    width: clamp(100px, 100%, 800px);
+    height: minmax(100px 300px);
+    width: clamp(100px, 90%, 800px);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: start;
     padding: 10px;
 
 }
