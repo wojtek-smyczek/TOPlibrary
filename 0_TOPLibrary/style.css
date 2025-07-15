@@ -52,7 +52,13 @@ body {
 
 }
 
-.showButton {
+form {
+    grid-column: 2 / 3;
+}
+
+
+.showButton,
+.newButton {
     grid-column: 2 / 3;
     background-color: lightcoral;
     border-radius: 10px;
@@ -72,7 +78,24 @@ body {
     width: clamp(100px, 90%, 800px);
     display: flex;
     justify-content: center;
-    align-items: start;
+    align-items: center;
     padding: 10px;
+    flex-direction: column;
+
 
 }
+
+.cardRemove .changeStatus {
+    flex-grow: 1;
+    width: 100%;
+    border: none;
+    color: grey;
+    font-weight: 200;
+}
+
+
+
+
+.form {}
+
+input {}
