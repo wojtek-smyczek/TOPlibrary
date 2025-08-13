@@ -1,144 +1,145 @@
-const myLibrary = [];
+class Book {
+    constructor(title, author, read = false) {
+        this.uuid = crypto.randomUUID();
+        this.title = title;
+        this.author = author;
+        this.read = read;
+    }
 
-function Book(title, author, read = false) {
-    let uuid = crypto.randomUUID();
+    status() {
+        return this.read ? "Read" : "Not read";
+    }
 
-    this.uuid = uuid;
-    this.title = title;
-    this.author = author;
-    this.read = read;
+    toggleRead() {
+        this.read = !this.read;
+        return this.status();
+    }
 }
 
-Book.prototype.status = function () {
-    return this.read ? "Read" : "Not read";
-}
+class LibraryUI {
+    constructor(library) {
+        this.library = library;
+        this.initEventListeners();
+        this.hideForm();
+    }
 
-
-
-function addBookToLibrary(title, author, read = false) {
-
-    const book = new Book(title, author, read);
-
-    myLibrary.push(book);
-}
-
-
-
-
-function printLibrary() {
-    // Clear existing cards first to avoid duplicates
-    document.querySelectorAll('.card').forEach(card => card.remove());
-
-    myLibrary.forEach((book) => createCard(book));
-}
-
-
-
-function createCard(book) {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.dataset.uuid = book.uuid;
-
-    card.innerHTML = `author: ${book.author} <br> title: ${book.title}`;
-
-    const cardRemove = document.createElement("button");
-    cardRemove.className = "cardRemove";
-    cardRemove.innerHTML = 'Remove Book'
-
-    cardRemove.addEventListener("click", function () {
-        // usuwamy ksiazke z biblioteki
-        const index = myLibrary.findIndex(function (b) {
-            return b.uuid === book.uuid;
-        })
-
-        if (index !== -1) {
-            myLibrary.splice(index, 1);
-            card.remove();
-            if ((myLibrary.length === 0)) {
-                unhideNewBook();
+    initEventListeners() {
+        document.addEventListener('DOMContentLoaded', () => {
+            const showButton = document.querySelector(".showButton");
+            if (showButton) {
+                showButton.addEventListener("click", () => {
+                    this.printLibrary();
+                    this.removeAllButtons();
+                });
             }
 
+            const newBookButton = document.querySelector('.newButton');
+            if (newBookButton) {
+                newBookButton.addEventListener('click', () => {
+                    this.removeAllButtons();
+                    this.unhideForm();
+                });
+            }
+
+            const addBookButton = document.querySelector('.submitButton');
+            if (addBookButton) {
+                addBookButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.handleAddBook();
+                });
+            }
+        });
+    }
+
+    handleAddBook() {
+        const title = document.querySelector('.title').value;
+        const author = document.querySelector('.author').value;
+
+        if (title && author) {
+            const book = new Book(title, author);
+            this.library.addBook(book);
+            this.hideForm();
+            this.printLibrary();
+            this.removeAllButtons();
         }
+    }
 
+    createCard(book) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.uuid = book.uuid;
 
-    });
+        card.innerHTML = `author: ${book.author} <br> title: ${book.title}`;
 
-    const changeStatus = document.createElement('button');
-    changeStatus.className = 'changeStatus';
-    changeStatus.innerHTML = book.status();
+        // Remove button
+        const removeButton = document.createElement("button");
+        removeButton.className = "cardRemove";
+        removeButton.textContent = 'Remove Book';
 
-    changeStatus.addEventListener("click", function () {
-        book.read = !book.read;
-        changeStatus.innerHTML = book.status();
-    })
-
-
-
-    card.appendChild(changeStatus);
-    card.appendChild(cardRemove);
-    document.body.appendChild(card);
-}
-
-
-
-addBookToLibrary('Stary', 'Hemingway');
-addBookToLibrary('Poezja Wybrana', 'Milosz');
-
-const unhideNewBook = function () {
-    document.querySelectorAll('.newButton').forEach(b => b.style.display = '')
-}
-
-const removeAllButtons = function () {
-    document.querySelectorAll('.showButton').forEach(button => button.style.display = 'none');
-    document.querySelectorAll('.newButton').forEach(button => button.style.display = 'none');
-}
-
-const hideForm = function () {
-    document.querySelectorAll('form').forEach(form => form.style.display = 'none');
-}
-
-const unhideForm = function () {
-    document.querySelectorAll('form').forEach(form => form.style.display = '')
-}
-
-// Wait for DOM to load before attaching event listeners
-document.addEventListener('DOMContentLoaded', () => {
-
-    hideForm();
-    // Use querySelector for single element or [0] to get first match
-    const showButton = document.querySelector(".showButton");
-    if (showButton) {
-        showButton.addEventListener("click", function () {
-            printLibrary();
-            removeAllButtons();
+        removeButton.addEventListener("click", () => {
+            this.library.removeBook(book.uuid);
+            card.remove();
+            if (this.library.books.length === 0) {
+                this.unhideNewBook();
+            }
         });
 
+        // Status button
+        const statusButton = document.createElement('button');
+        statusButton.className = 'changeStatus';
+        statusButton.textContent = book.status();
+
+        statusButton.addEventListener("click", () => {
+            statusButton.textContent = book.toggleRead();
+        });
+
+        card.appendChild(statusButton);
+        card.appendChild(removeButton);
+        document.body.appendChild(card);
     }
-});
 
-const newBook = document.querySelector('.newButton');
+    printLibrary() {
+        // Clear existing cards first to avoid duplicates
+        document.querySelectorAll('.card').forEach(card => card.remove());
+        this.library.books.forEach(book => this.createCard(book));
+    }
 
-newBook.addEventListener('click', function () {
-    removeAllButtons();
-    unhideForm();
-})
+    unhideNewBook() {
+        document.querySelectorAll('.newButton').forEach(b => b.style.display = '');
+    }
 
-const addBook = document.querySelector('.submitButton');
-if (addBook) {
-    addBook.addEventListener('click', function (e) {
-        e.preventDefault(); //prevent from submission reload
+    removeAllButtons() {
+        document.querySelectorAll('.showButton').forEach(button => button.style.display = 'none');
+        document.querySelectorAll('.newButton').forEach(button => button.style.display = 'none');
+    }
 
-        const title = document.querySelector('.title');
-        const titleContent = title.value;
+    hideForm() {
+        document.querySelectorAll('form').forEach(form => form.style.display = 'none');
+    }
 
-        const author = document.querySelector('.author');
-        const authorContent = author.value;
-
-        addBookToLibrary(titleContent, authorContent);
-        hideForm();
-        printLibrary();
-        removeAllButtons();
-
-    });
-
+    unhideForm() {
+        document.querySelectorAll('form').forEach(form => form.style.display = '');
+    }
 }
+
+class Library {
+    constructor() {
+        this.books = [];
+    }
+
+    addBook(book) {
+        this.books.push(book);
+    }
+
+    removeBook(uuid) {
+        this.books = this.books.filter(book => book.uuid !== uuid);
+    }
+}
+
+
+const library = new Library();
+const libraryUI = new LibraryUI(library);
+
+// Add some initial books
+// library.addBook(new Book('Stary', 'Hemingway'));
+// library.addBook(new Book('Poezja Wybrana', 'Milosz'));
